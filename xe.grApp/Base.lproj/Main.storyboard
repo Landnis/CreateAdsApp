@@ -1,24 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.16" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.12"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Launch View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                <viewController id="BYZ-38-t0r" customClass="LaunchViewController" customModule="xe_grApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" customClass="LaunchView" customModule="xe_grApp" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" xcode11CocoaTouchSystemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Fuo-mx-UMJ">
+                                <rect key="frame" x="76.666666666666686" y="332" width="240" height="213"/>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1DY-Mu-PG3">
+                                <rect key="frame" x="88.666666666666686" y="557.33333333333337" width="216" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="Fuo-mx-UMJ" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" multiplier="0.250235" id="QGi-PG-0SP"/>
+                            <constraint firstItem="Fuo-mx-UMJ" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="0.610687" id="a8Y-H5-Z7S"/>
+                            <constraint firstItem="Fuo-mx-UMJ" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="aLd-eY-6DL"/>
+                            <constraint firstItem="Fuo-mx-UMJ" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="aag-Lj-5Ho"/>
+                            <constraint firstItem="1DY-Mu-PG3" firstAttribute="width" secondItem="Fuo-mx-UMJ" secondAttribute="width" multiplier="0.9" id="s6X-0V-WMY"/>
+                            <constraint firstItem="1DY-Mu-PG3" firstAttribute="top" secondItem="Fuo-mx-UMJ" secondAttribute="bottom" constant="12.333333333333314" id="uwB-Vx-fzF"/>
+                            <constraint firstItem="1DY-Mu-PG3" firstAttribute="centerX" secondItem="Fuo-mx-UMJ" secondAttribute="centerX" id="wLK-Tu-iyN"/>
+                        </constraints>
+                        <connections>
+                            <outlet property="launchImageView" destination="Fuo-mx-UMJ" id="fud-0I-1a1"/>
+                            <outlet property="loadingLabel" destination="1DY-Mu-PG3" id="SB7-gg-cj8"/>
+                        </connections>
                     </view>
+                    <connections>
+                        <outlet property="lanchView" destination="8bC-Xf-vdC" id="Tb7-Nd-YKn"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="140" y="4"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>
