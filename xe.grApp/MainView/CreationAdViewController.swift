@@ -16,7 +16,11 @@ class CreationAdViewController: UIViewController {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        creationAdView.collectionHeightConstraint.constant = 0
+        creationAdView.collectionView.isHidden = true
+        UIView.animate(withDuration: 0.25) {
+            self.creationAdView.layoutIfNeeded()
+        }
     }
 
 }
