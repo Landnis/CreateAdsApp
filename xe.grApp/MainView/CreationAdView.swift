@@ -95,6 +95,8 @@ class CreationAdView: UIView {
             descriptionTextView.backgroundColor = .lightGray.withAlphaComponent(0.3)
             descriptionTextView.keyboardType = .default
             descriptionTextView.text = "Type something..."
+            descriptionTextView.layer.cornerRadius = 8
+            descriptionTextView.clipsToBounds = true
         }
     }
     
@@ -105,11 +107,11 @@ class CreationAdView: UIView {
             layout.minimumInteritemSpacing = 0
             collectionView.collectionViewLayout = layout
             collectionView.showsHorizontalScrollIndicator = false
-            collectionView.backgroundColor = .red
-            collectionView.isScrollEnabled = false
+            collectionView.backgroundColor = .clear
+            collectionView.isScrollEnabled = true
             
-//            let popularMovieNibname = UINib(nibName: "PopularMoviesCell", bundle: nil)
-//            collectionView.register(popularMovieNibname, forCellWithReuseIdentifier: "PopularMoviesCell")
+            let searchResultsCellNibname = UINib(nibName: "SearchResultsCell", bundle: nil)
+            collectionView.register(searchResultsCellNibname, forCellWithReuseIdentifier: "SearchResultsCell")
         }
     }
     
@@ -117,10 +119,11 @@ class CreationAdView: UIView {
         didSet {
             confirmButton.setTitle("Submit", for: .normal)
             confirmButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-            confirmButton.setTitleColor(.white, for: .normal)
             confirmButton.backgroundColor = .green
             confirmButton.layer.cornerRadius = 8
             confirmButton.clipsToBounds = true
+            confirmButton.isUserInteractionEnabled = false
+            confirmButton.setTitleColor(confirmButton.isUserInteractionEnabled ? .white : .lightGray, for: .normal)
         }
     }
     
