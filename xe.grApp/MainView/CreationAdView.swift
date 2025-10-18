@@ -123,7 +123,7 @@ class CreationAdView: UIView {
             confirmButton.layer.cornerRadius = 8
             confirmButton.clipsToBounds = true
             confirmButton.isUserInteractionEnabled = false
-            confirmButton.setTitleColor(confirmButton.isUserInteractionEnabled ? .white : .lightGray, for: .normal)
+            confirmButton.setTitleColor(.white, for: .normal)
         }
     }
     

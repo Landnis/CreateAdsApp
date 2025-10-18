@@ -10,8 +10,9 @@ import UIKit
 class CreationAdViewController: UIViewController {
     
     var searchResults: [SearchLocationResponse] = []
-    var textFieldQuery: String?
+    var selectedLocation: String?
     var shouldShowResults: Bool = false
+    private var debounceTask: Task<Void, Never>?
     @IBOutlet var creationAdView: CreationAdView! {
         didSet {
             creationAdView.backgroundColor = .white
@@ -20,29 +21,44 @@ class CreationAdViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setCollectionView()
+        setResultView()
         creationAdView.collectionView.delegate = self
         creationAdView.collectionView.dataSource = self
         creationAdView.locationTextField.delegate = self
     }
     
-    private func setCollectionView() {
+    private func setResultView() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             let hasResults = !searchResults.isEmpty
             creationAdView.collectionView.isHidden = !hasResults
             creationAdView.collectionHeightConstraint.constant = CGFloat(hasResults ? (searchResults.count * 64) : 0) //hasResults ? 150 : 0
             creationAdView.collectionView.reloadData()
-            creationAdView.priceTextField.isHidden = hasResults ? true : false
-            creationAdView.priceTextFieldLabel.isHidden = hasResults ? true : false
-            creationAdView.descriptionTextView.isHidden = hasResults ? true : false
-            creationAdView.descriptionLabel.isHidden = hasResults ? true : false
-            creationAdView.clearButton.isHidden = hasResults ? true : false
-            creationAdView.confirmButton.isHidden = hasResults ? true : false
+            shouldHideTextFields(shouldHide: hasResults)
             UIView.animate(withDuration: 0.25) {
                 self.creationAdView.layoutIfNeeded()
             }
         }
+    }
+    
+    private func shouldEnableSubmitButton(_ enabled: Bool) {
+        creationAdView.confirmButton.isUserInteractionEnabled = enabled
+        creationAdView.confirmButton.alpha = enabled ? 1.0 : 0.5
+    }
+    
+    private func validateForm() {
+        let titleValid = !(creationAdView.adTitleTextField.text ?? "").isEmpty
+        let locationValid = !(selectedLocation ?? "").isEmpty
+        shouldEnableSubmitButton(titleValid && locationValid)
+    }
+    
+    private func shouldHideTextFields(shouldHide: Bool) {
+        creationAdView.priceTextField.isHidden = shouldHide
+        creationAdView.priceTextFieldLabel.isHidden = shouldHide
+        creationAdView.descriptionTextView.isHidden = shouldHide
+        creationAdView.descriptionLabel.isHidden = shouldHide
+        creationAdView.clearButton.isHidden = shouldHide
+        creationAdView.confirmButton.isHidden = shouldHide
     }
     
     @IBAction func clearButtonTapped(_ sender: Any) {
@@ -50,11 +66,18 @@ class CreationAdViewController: UIViewController {
         creationAdView.locationTextField.text = nil
         creationAdView.priceTextField.text = nil
         creationAdView.descriptionTextView.text = nil
-        
+        searchResults.removeAll()
+        setResultView()
+        shouldEnableSubmitButton(false)
     }
     
     @IBAction func submitButtonTapped(_ sender: Any) {
-        
+        debugPrint(
+            creationAdView.adTitleTextField.text ?? "",
+            selectedLocation ?? "",
+            creationAdView.priceTextField.text ?? "",
+            creationAdView.descriptionTextView.text ?? ""
+        )
     }
     
     @MainActor
@@ -66,7 +89,7 @@ class CreationAdViewController: UIViewController {
             )
             print("✅ Response:", response)
             searchResults = response
-            setCollectionView()
+            setResultView()
         } catch {
             print("❌ Error:", error.localizedDescription)
         }
@@ -92,9 +115,10 @@ extension CreationAdViewController: UICollectionViewDelegate, UICollectionViewDa
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         creationAdView.endEditing(true)
         creationAdView.locationTextField.text = searchResults[indexPath.row].displayText
-        textFieldQuery = searchResults[indexPath.row].displayText
+        selectedLocation = searchResults[indexPath.row].displayText
         searchResults.removeAll()
-        setCollectionView()
+        setResultView()
+        validateForm()
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
@@ -104,27 +128,38 @@ extension CreationAdViewController: UICollectionViewDelegate, UICollectionViewDa
 }
 
 extension CreationAdViewController: UITextFieldDelegate {
+    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        if let current = textField.text as NSString? {
-            let newText = current.replacingCharacters(in: range, with: string)
-            textFieldQuery = ""
-            if newText.count >= 3 {
-                Task {
-                    await searchLocations(textQuery: newText)
-                }
-            } else if newText.count == 0 {
-                setCollectionView()
-            }
+        guard let current = textField.text as NSString? else { return true }
+        let newText = current.replacingCharacters(in: range, with: string)
+        selectedLocation = nil
+        validateForm()
+        
+        if newText.count < 3 {
+            searchResults.removeAll()
+            setResultView()
+            return true
+        }
+       
+        debounceTask?.cancel()
+        debounceTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 400_000_000) // ~0.4 sec
+            await self?.searchLocations(textQuery: newText)
         }
         return true
     }
+    
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }
     
-    func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
-        debugPrint(reason)
+    func textFieldDidEndEditing(_ textField: UITextField) {
+//        guard textField == creationAdView.locationTextField else { return }
+//        guard !isSelectingLocationFromResults else { return } // <-- prevents unwanted hide
+//        
+//        searchResults.removeAll()
+//        setResultView()
     }
 }
