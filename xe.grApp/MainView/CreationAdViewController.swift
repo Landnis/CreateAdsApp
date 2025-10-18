@@ -33,7 +33,7 @@ class CreationAdViewController: UIViewController {
             guard let self else { return }
             let hasResults = !searchResults.isEmpty
             creationAdView.collectionView.isHidden = !hasResults
-            creationAdView.collectionHeightConstraint.constant = CGFloat(hasResults ? (searchResults.count * 64) : 0) //hasResults ? 150 : 0
+            creationAdView.collectionHeightConstraint.constant = CGFloat(hasResults ? (searchResults.count * 64) : 0)
             creationAdView.collectionView.reloadData()
             shouldHideTextFields(shouldHide: hasResults)
             UIView.animate(withDuration: 0.25) {
@@ -82,13 +82,11 @@ class CreationAdViewController: UIViewController {
             creationAdView.priceTextField.text ?? "",
             creationAdView.descriptionTextView.text ?? ""
         )
-        // Validate mandatory fields
         guard let location = selectedLocation, (selectedLocation != nil) else {
             showAlert(title: "Error", message: "Please fill in all mandatory fields (Location & Title).")
             return
         }
         
-        // Create the model
         let ad = AdCreationModel(
             location: location,
             title: creationAdView.adTitleTextField.text ?? " ",
@@ -104,7 +102,6 @@ class CreationAdViewController: UIViewController {
             
             showAlert(title: "JSON Created", message: jsonString)
             
-            // Clear all text fields
             clearAllTheFields()
         } catch {
             showAlert(title: "Error", message: "Failed to create JSON: \(error)")
@@ -161,7 +158,6 @@ extension CreationAdViewController: UICollectionViewDelegate, UICollectionViewDa
         searchResults.removeAll()
         setResultView()
         validateForm()
-        // Reset the flag AFTER selection
         DispatchQueue.main.async {
             self.isSelectingLocationFromResults = false
         }
@@ -182,6 +178,7 @@ extension CreationAdViewController: UITextFieldDelegate {
         validateForm()
         
         if newText.count < 3 {
+            debounceTask?.cancel()
             searchResults.removeAll()
             setResultView()
             return true
@@ -195,40 +192,11 @@ extension CreationAdViewController: UITextFieldDelegate {
         return true
     }
     
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-    
     func textFieldDidEndEditing(_ textField: UITextField) {
         guard textField == creationAdView.locationTextField else { return }
         guard !isSelectingLocationFromResults else { return }
         
         searchResults.removeAll()
         setResultView()
-        debugPrint(textField.text)
     }
 }
-
-//// MARK: Keyboard functions
-//extension CreationAdViewController {
-//    
-//    // Move Keyboard when textfield gets focus
-//    @objc func keyboardWillShow(notification: NSNotification) {
-//        guard let userInfo = notification.userInfo,
-//              let keyboardSize = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
-//        
-//        let keyboardFrame = keyboardSize.cgRectValue
-//
-//        if creat.frame.origin.y == 0 {
-//            createVbanView.frame.origin.y -= keyboardFrame.height / 2
-//        }
-//    }
-//
-//    @objc func keyboardWillHide(notification: NSNotification) {
-//        if createVbanView.frame.origin.y != 0 {
-//            createVbanView.frame.origin.y = 0
-//        }
-//    }
-//}
