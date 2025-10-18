@@ -138,4 +138,11 @@ class CreationAdView: UIView {
             clearButton.clipsToBounds = true
         }
     }
+    
+    @IBOutlet weak var buttonsContainerView: UIView! {
+        didSet {
+            buttonsContainerView.backgroundColor = .clear
+        }
+    }
+    
 }
