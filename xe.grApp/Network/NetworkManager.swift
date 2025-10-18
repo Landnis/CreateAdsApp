@@ -7,12 +7,12 @@
 
 import Foundation
 
-final class NetworkManager {
+class NetworkManager {
     static let shared = NetworkManager()
     private init() {}
     private let baseUrl = "https://oapaiqtgkr6wfbum252tswprwa0ausnb.lambda-url.eu-central-1.on.aws"
     private let queryParameter = "input"
-    /// Generic GET request that decodes a response model
+    
     func request<ResponseData: Decodable>(
         searchValue: String,
         responseType: ResponseData.Type
@@ -42,5 +42,18 @@ final class NetworkManager {
         // Decode response
         let decoded = try JSONDecoder().decode(ResponseData.self, from: data)
         return decoded
+    }
+    
+    func encodeToJSON<CodableObject: Codable>(_ object: CodableObject) throws -> String {
+        
+        // Encode the object
+        let jsonData = try JSONEncoder().encode(object)
+        
+        // Validate the String jsonData
+        guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+            throw NSError(domain: "JSONEncodingError", code: -1)
+        }
+        
+        return jsonString
     }
 }

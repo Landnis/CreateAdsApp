@@ -94,7 +94,7 @@ class CreationAdView: UIView {
         didSet {
             descriptionTextView.backgroundColor = .lightGray.withAlphaComponent(0.3)
             descriptionTextView.keyboardType = .default
-            descriptionTextView.text = "Type something..."
+            descriptionTextView.text = ""
             descriptionTextView.layer.cornerRadius = 8
             descriptionTextView.clipsToBounds = true
         }
@@ -124,6 +124,7 @@ class CreationAdView: UIView {
             confirmButton.clipsToBounds = true
             confirmButton.isUserInteractionEnabled = false
             confirmButton.setTitleColor(.white, for: .normal)
+            confirmButton.alpha = confirmButton.isUserInteractionEnabled ? 1.0 : 0.5
         }
     }
     

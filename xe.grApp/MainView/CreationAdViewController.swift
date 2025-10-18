@@ -12,6 +12,7 @@ class CreationAdViewController: UIViewController {
     var searchResults: [SearchLocationResponse] = []
     var selectedLocation: String?
     var shouldShowResults: Bool = false
+    var isSelectingLocationFromResults: Bool = false
     private var debounceTask: Task<Void, Never>?
     @IBOutlet var creationAdView: CreationAdView! {
         didSet {
@@ -47,9 +48,8 @@ class CreationAdViewController: UIViewController {
     }
     
     private func validateForm() {
-        let titleValid = !(creationAdView.adTitleTextField.text ?? "").isEmpty
         let locationValid = !(selectedLocation ?? "").isEmpty
-        shouldEnableSubmitButton(titleValid && locationValid)
+        shouldEnableSubmitButton(locationValid)
     }
     
     private func shouldHideTextFields(shouldHide: Bool) {
@@ -62,6 +62,10 @@ class CreationAdViewController: UIViewController {
     }
     
     @IBAction func clearButtonTapped(_ sender: Any) {
+        clearAllTheFields()
+    }
+    
+    private func clearAllTheFields() {
         creationAdView.adTitleTextField.text = nil
         creationAdView.locationTextField.text = nil
         creationAdView.priceTextField.text = nil
@@ -78,6 +82,39 @@ class CreationAdViewController: UIViewController {
             creationAdView.priceTextField.text ?? "",
             creationAdView.descriptionTextView.text ?? ""
         )
+        // Validate mandatory fields
+        guard let location = selectedLocation, (selectedLocation != nil) else {
+            showAlert(title: "Error", message: "Please fill in all mandatory fields (Location & Title).")
+            return
+        }
+        
+        // Create the model
+        let ad = AdCreationModel(
+            location: location,
+            title: creationAdView.adTitleTextField.text ?? " ",
+            price: creationAdView.priceTextField.text?.isEmpty == true ? nil : creationAdView.priceTextField.text,
+            description:  creationAdView.descriptionTextView.text?.isEmpty == true ? nil :  creationAdView.descriptionTextView.text )
+        
+        sendTheAdToServer(adCreation: ad)
+    }
+    
+    private func sendTheAdToServer(adCreation: AdCreationModel) {
+        do {
+            let jsonString = try NetworkManager.shared.encodeToJSON(adCreation)
+            
+            showAlert(title: "JSON Created", message: jsonString)
+            
+            // Clear all text fields
+            clearAllTheFields()
+        } catch {
+            showAlert(title: "Error", message: "Failed to create JSON: \(error)")
+        }
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
     
     @MainActor
@@ -112,6 +149,11 @@ extension CreationAdViewController: UICollectionViewDelegate, UICollectionViewDa
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        isSelectingLocationFromResults = true
+        return true
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         creationAdView.endEditing(true)
         creationAdView.locationTextField.text = searchResults[indexPath.row].displayText
@@ -119,6 +161,10 @@ extension CreationAdViewController: UICollectionViewDelegate, UICollectionViewDa
         searchResults.removeAll()
         setResultView()
         validateForm()
+        // Reset the flag AFTER selection
+        DispatchQueue.main.async {
+            self.isSelectingLocationFromResults = false
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
@@ -143,7 +189,7 @@ extension CreationAdViewController: UITextFieldDelegate {
        
         debounceTask?.cancel()
         debounceTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 400_000_000) // ~0.4 sec
+            try? await Task.sleep(nanoseconds: 400_000_000)
             await self?.searchLocations(textQuery: newText)
         }
         return true
@@ -156,10 +202,33 @@ extension CreationAdViewController: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-//        guard textField == creationAdView.locationTextField else { return }
-//        guard !isSelectingLocationFromResults else { return } // <-- prevents unwanted hide
-//        
-//        searchResults.removeAll()
-//        setResultView()
+        guard textField == creationAdView.locationTextField else { return }
+        guard !isSelectingLocationFromResults else { return }
+        
+        searchResults.removeAll()
+        setResultView()
+        debugPrint(textField.text)
     }
 }
+
+//// MARK: Keyboard functions
+//extension CreationAdViewController {
+//    
+//    // Move Keyboard when textfield gets focus
+//    @objc func keyboardWillShow(notification: NSNotification) {
+//        guard let userInfo = notification.userInfo,
+//              let keyboardSize = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+//        
+//        let keyboardFrame = keyboardSize.cgRectValue
+//
+//        if creat.frame.origin.y == 0 {
+//            createVbanView.frame.origin.y -= keyboardFrame.height / 2
+//        }
+//    }
+//
+//    @objc func keyboardWillHide(notification: NSNotification) {
+//        if createVbanView.frame.origin.y != 0 {
+//            createVbanView.frame.origin.y = 0
+//        }
+//    }
+//}
