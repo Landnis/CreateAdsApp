@@ -152,15 +152,14 @@ extension CreationAdViewController: UICollectionViewDelegate, UICollectionViewDa
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        creationAdView.endEditing(true)
+        isSelectingLocationFromResults = true
         creationAdView.locationTextField.text = searchResults[indexPath.row].displayText
         selectedLocation = searchResults[indexPath.row].displayText
         searchResults.removeAll()
         setResultView()
         validateForm()
-        DispatchQueue.main.async {
-            self.isSelectingLocationFromResults = false
-        }
+        creationAdView.endEditing(true)
+        isSelectingLocationFromResults = false
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
@@ -183,7 +182,7 @@ extension CreationAdViewController: UITextFieldDelegate {
             setResultView()
             return true
         }
-       
+        
         debounceTask?.cancel()
         debounceTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 400_000_000)
@@ -194,9 +193,9 @@ extension CreationAdViewController: UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         guard textField == creationAdView.locationTextField else { return }
-        guard !isSelectingLocationFromResults else { return }
-        
-        searchResults.removeAll()
-        setResultView()
+        if !isSelectingLocationFromResults {
+            searchResults.removeAll()
+            setResultView()
+        }
     }
 }
