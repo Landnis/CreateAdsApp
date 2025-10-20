@@ -83,7 +83,7 @@ class CreationAdViewController: UIViewController {
             creationAdView.descriptionTextView.text ?? ""
         )
         guard let location = selectedLocation, (selectedLocation != nil) else {
-            showAlert(title: "Error", message: "Please fill in all mandatory fields (Location & Title).")
+            showAlert(title: "Error", message: "Please fill the location field.")
             return
         }
         
