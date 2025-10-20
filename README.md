@@ -8,12 +8,14 @@ This is an app that create an add with an autocomplete API.
 - Lightweight networking using URLSession
 
  ## 🛠 Tech Stack
- UI Framework  -> UIKit 
- Architecture  -> MVC 
- Language      -> Swift 
- Networking    -> URLSession async/await |
- Caching       -> NSCache 
- iOS Target    -> iOS 16+
+| Component      | Technology |
+|---------------|-------------|
+| UI Framework  | UIKit |
+| Architecture  | MVC |
+| Language      | Swift |
+| Networking    | URLSession async/await |
+| Caching       | NSCache |
+| iOS Target    | iOS 16+ |
 
 ## 📡 API
 The app uses an autocomplete API to fetch suggested locations based on user input.  
