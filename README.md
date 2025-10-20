@@ -26,3 +26,8 @@ This app implements device-level caching (in-memory) using 'NSCache' to:
 - Reduce duplicate network requests  
 - Improve performance and responsiveness  
 - Allow instant results when searching the same query again
+
+## 🚀 Getting Started
+1. Clone the repository  
+2. Open the project in Xcode (14+ recommended)  
+4. Build & run on iOS 16+ device or simulator
